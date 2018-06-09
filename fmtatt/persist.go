@@ -12,12 +12,12 @@ var DefaultPersistenceConfig = PersistenceConfig{
 
 type PersistenceProvider interface {
 	PutDidFmtOne(config Config, pr SimplePullRequestT) error
-	GetDidFmtOne(config Config, repo RepoSpec) (pr *SimplePullRequestT, err error)
+	GetDidFmtOne(config Config, repo RepoT) (pr *SimplePullRequestT, err error)
 
 	PutDidFmtList(config Config, rs RepoListSpec) error
 	GetDidFmtList(config Config) (rss []RepoListSpec, err error)
 
-	PutDidWalkOne(config Config, r RepoSpec) error
+	PutDidWalkOne(config Config, r RepoT) error
 	GetDidWalkOne(config Config, r RepoListSpec) (didWalk bool, err error)
 
 	PutDidWalkList(config Config, rs RepoListSpec) error

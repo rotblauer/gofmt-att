@@ -1,17 +1,15 @@
 package fmtatt
 
 import (
-	"context"
-	"net/http"
 	"time"
 )
 
 type RepoProvider interface {
 	// NewClient should be used to initialize client per package for global reuse there.
-	NewClient(*http.Client) interface{}
-	GetRepos(ctx context.Context, reposFilter RepoListSpec) (repos []SimpleRemoteT, err error)
-	ForkRepo(ctx context.Context, authID AuthIdentity) (repo SimpleRemoteT, err error)
-	CreatePullRequest(ctx context.Context, pr SimplePullRequestT) error
+	NewClient(identity AuthIdentity) *interface{}
+	GetRepos(reposFilter RepoListSpec) (repos []RepoT, err error)
+	ForkRepo(rs RepoT) (repo RepoT, err error)
+	CreatePullRequest(pr SimplePullRequestT) error
 }
 
 var DefaultPRConfig = PullRequestConfig{
@@ -27,7 +25,7 @@ Formattered with :heart: by [gofmt-att](https://github.com/rotblauer/gofmt-att).
 }
 
 var DefaultReposSpec = RepoListSpec{
-	RepoSpec: RepoSpec{
+	RepoT: RepoT{
 		Owner: "rotblauer",
 		Name:  "gofmt-att",
 	},
@@ -36,11 +34,6 @@ var DefaultReposSpec = RepoListSpec{
 	SortBy:     "updated",
 	OrderBy:    "desc",
 	Visibility: "visible",
-}
-
-type SimpleRemoteT struct {
-	CloneUrl string
-	GitUrl   string
 }
 
 type SimpleCommitConfig struct {
@@ -52,8 +45,7 @@ type SimpleCommitConfig struct {
 }
 
 type SimplePullRequestT struct {
-	AuthIdentity
-	SimpleRemoteT
+	RepoT
 	Title string
 	Head  string
 	Base  string
@@ -69,14 +61,15 @@ type PullRequestConfig struct {
 	BodyFile string
 }
 
-type RepoSpec struct {
+type RepoT struct {
 	Owner string
 	Name  string
-	SimpleRemoteT
+	CloneUrl string
+	GitUrl   string
 }
 
 type RepoListSpec struct {
-	RepoSpec
+	RepoT
 	Languages  []string
 	IsFork     bool
 	SortBy     string
