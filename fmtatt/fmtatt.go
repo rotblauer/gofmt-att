@@ -1,7 +1,6 @@
 package fmtatt
 
 import (
-	"github.com/rotblauer/gofmt-att/fmtatt/providers/log"
 	"log"
 )
 
@@ -49,6 +48,7 @@ func New(c *Config) *FmtAtt {
 
 	switch c.RepoProvider {
 	case "Github":
+		f.Repoer = NewGoogleGithubProvider(f.Config.Identity)
 	default:
 		log.Fatalln("unsupported repo provider type:", c.RepoProvider)
 	}
@@ -56,7 +56,7 @@ func New(c *Config) *FmtAtt {
 	for _, l := range c.Logs {
 		switch l.Logger {
 		case "stderr":
-			lo := logstderr.StdLogger{}
+			lo := StdLogger{}
 			lo.SetLevel(l.Level)
 			f.Loggers = append(f.Loggers, lo)
 		default:

@@ -5,8 +5,6 @@ import (
 )
 
 type RepoProvider interface {
-	// NewClient should be used to initialize client per package for global reuse there.
-	NewClient(identity AuthIdentity) *interface{}
 	GetRepos(reposFilter RepoListSpec) (repos []RepoT, err error)
 	ForkRepo(rs RepoT) (repo RepoT, err error)
 	CreatePullRequest(pr SimplePullRequestT) error

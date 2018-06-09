@@ -1,4 +1,4 @@
-package logstderr
+package fmtatt
 
 import (
 	"log"
