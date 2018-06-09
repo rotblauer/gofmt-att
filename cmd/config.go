@@ -17,6 +17,10 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 	"os"
+	"io"
+	"encoding/json"
+	"github.com/rotblauer/gofmt-att/common"
+	"log"
 )
 
 // configCmd represents the config command
@@ -31,4 +35,13 @@ var configCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(configCmd)
+}
+
+func writeDefaultConfig(w io.Writer) error {
+	b, err := json.MarshalIndent(&common.DefaultFmtAttConfig, "", "  ")
+	if err != nil {
+		log.Fatalln("could not marshal json:", err)
+	}
+	_, err = w.Write(b)
+	return err
 }

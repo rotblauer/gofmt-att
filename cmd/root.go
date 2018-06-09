@@ -22,9 +22,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"log"
-	"io"
-	"encoding/json"
-	"github.com/rotblauer/gofmt-att/fmtatt"
 )
 
 var cfgFile string
@@ -96,11 +93,3 @@ func initConfig() {
 	// TODO else if not using create command, Fatal!
 }
 
-func writeDefaultConfig(w io.Writer) error {
-	b, err := json.MarshalIndent(&fmtatt.DefaultFmtAttConfig, "", "  ")
-	if err != nil {
-		log.Fatalln("could not marshal json:", err)
-	}
-	_, err = w.Write(b)
-	return err
-}

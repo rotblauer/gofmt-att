@@ -15,21 +15,6 @@ type Config struct {
 	Logs              []LogConfig
 }
 
-var DefaultFmtAttConfig = &Config{
-	RepoProvider: "Github",
-	Identity: AuthIdentity{
-		Username: "whilei",
-		RawToken: "",
-		EnvToken: "",
-	},
-	Fmt:               []FmtConfig{DefaultFmter},
-	ReposFilter:       DefaultReposSpec,
-	PullRequestConfig: DefaultPRConfig,
-	WalkPattern:       DefaultWalkPattern,
-	PersistConfig:     []PersistenceConfig{DefaultPersistenceConfig},
-	Logs:              []LogConfig{DefaultLogConfig},
-}
-
 type FmtAtt struct {
 	Config *Config
 

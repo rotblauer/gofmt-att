@@ -16,9 +16,10 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/rotblauer/gofmt-att/fmtatt"
 	"github.com/spf13/viper"
 	"log"
+	"github.com/rotblauer/gofmt-att/common"
+	"github.com/rotblauer/gofmt-att/fmtatt"
 )
 
 // runCmd represents the run command
@@ -27,7 +28,7 @@ var runCmd = &cobra.Command{
 	Short: "Runs shit.",
 	Long: ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		var c = fmtatt.DefaultFmtAttConfig
+		var c = &common.DefaultFmtAttConfig
 		if viper.ConfigFileUsed() != "" {
 			err := viper.Unmarshal(&c)
 			if err != nil {
