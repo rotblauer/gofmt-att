@@ -7,29 +7,67 @@ import (
 	"os"
 
 	"github.com/google/go-github/github"
-	"golang.org/x/oauth2"
-	"net/http"
+
 	"gopkg.in/src-d/go-git.v4"
 	gitConfig "gopkg.in/src-d/go-git.v4/config"
 	gitTransport "gopkg.in/src-d/go-git.v4/plumbing/transport"
 	gitObject "gopkg.in/src-d/go-git.v4/plumbing/object"
 	"time"
 	"os/exec"
+	"io/ioutil"
+	"flag"
+
+	"./gothub"
+	"gopkg.in/src-d/go-git.v4/plumbing"
+	"gopkg.in/src-d/go-git.v4/plumbing/storer"
+	"gopkg.in/src-d/go-git.v4/plumbing/filemode"
+	"gopkg.in/src-d/go-git.v4/plumbing/protocol/packp/sideband"
+	"golang.org/x/oauth2"
 )
 
-func fixemloop(c *http.CLient) {
-	gitTransport.AuthMethod()
+var (
+	// This needs to be set in order to use authenticated Github API requests.
+	GITHUB_TOKEN = "GITHUB_TOKEN"
+
+	workdir = os.TempDir()
+)
+
+func init() {
+	d, err := ioutil.TempDir("", "gofmt-att")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	workdir = d
+
+	flag.StringVar(&GITHUB_TOKEN, "github-token", "GITHUB_TOKEN", "Github token to use for API authentication. Can be EITHER the name of an environment variable, or a raw token.")
+	flag.Parse()
+}
+
+// newGithubClientAndContext creates a new context and github client. If the token is not an environment variable, it's raw value will be used.
+func NewGithubClientAndContext(token string) (ctx context.Context, client *github.Client) {
+	ghToken := os.Getenv(token)
+	if ghToken == "" {
+		// raw value
+		ghToken = token
+	}
+
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: ghToken},
+	)
+
+	ctx = context.Background()
+	tc := oauth2.NewClient(ctx, ts)
+	client = github.NewClient(tc)
+	return
 }
 
 func main() {
+	ctx, client := NewGithubClientAndContext(GITHUB_TOKEN)
 
-	ctx := context.Background()
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")},
-	)
-	tc := oauth2.NewClient(ctx, ts)
+	// meta, _, err := client.APIMeta(ctx)
+	// meta.
 
-	client := github.NewClient(tc)
+	// auth, _, err := client.Authorizations.Create(ctx, &github.AuthorizationRequest{})
 
 	// list all repositories for a user
 	repos, _, err := client.Repositories.List(ctx, "whilei", nil)
@@ -39,10 +77,9 @@ func main() {
 	for _, repo := range repos {
 		if !repo.GetFork() && repo.GetLanguage() == "Go" {
 			fmt.Println(repo.GetCloneURL())
+			fmt.Println(repo.GetGitURL())
 		}
 	}
-
-	// client.Octocat()
 
 	users, _, err := client.Users.ListFollowing(ctx, "whilei", nil)
 	if err != nil {
@@ -72,17 +109,19 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+	forkGitRemote := forkedRepo.GetGitURL()
 
 	r, err := git.PlainOpen("path/to/repo")
 	r.CreateBranch(&gitConfig.Branch{
-		Name: "gofmt-att",
+		Name:   "gofmt-att",
 		Remote: "origin",
-		Merge: "refs/heads/gofmt-att",
+		Merge:  "refs/heads/gofmt-att",
 	})
 	w, err := r.Worktree()
 	if err != nil {
 		// handle error
 	}
+
 	_, err = w.Add(".")
 	if err != nil {
 		// handle error
@@ -92,15 +131,30 @@ func main() {
 		// handle error
 	}
 	status.IsClean()
-	commit, err := w.Commit("example go-git commit", &git.CommitOptions{
+	_, err := w.Commit("example go-git commit", &git.CommitOptions{
 		Author: &gitObject.Signature{
 			Name:  "John Doe",
 			Email: "john@doe.org",
 			When:  time.Now(),
 		},
 	})
+	r.CreateRemote(&gitConfig.RemoteConfig{
+		Name: "whilei",
+		URLs: []string{forkGitRemote},
+	})
 
-	if err := r.Push(&git.PushOptions{}); err != nil {
+
+	// type PushOptions struct {
+	// 	RemoteName string
+	// 	RefSpecs []config.RefSpec
+	// 	Auth transport.AuthMethod
+	// 	Progress sideband.Progress
+	// }
+	if err := r.Push(&git.PushOptions{
+		RemoteName: "origin",
+		RefSpecs: []gitConfig.RefSpec{"+refs/heads/*:refs/remotes/origin/*"},
+		Auth:
+	}); err != nil {
 		// handle error
 	}
 
