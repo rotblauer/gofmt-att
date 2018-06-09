@@ -6,6 +6,7 @@ import (
 	"log"
 	"fmt"
 	"os"
+	"io"
 )
 
 var (
@@ -17,12 +18,14 @@ func init() {
 	flag.Parse()
 }
 
-func main() {
-	gofmt := exec.Command("gofmt", "-w")
-	gofmt.Args = append(gofmt.Args, ppath)
-	gofmt.Stderr = os.Stderr
+func runGofmt(ppath string, errW io.Writer) (out []byte, err error) {
+	gofmt := exec.Command("gofmt", "-w", ppath)
+	gofmt.Stderr = errW
+	return gofmt.Output()
+}
 
-	out, err := gofmt.Output()
+func main() {
+	out, err := runGofmt(ppath, os.Stderr)
 	if err != nil {
 		log.Fatal(err)
 	}
