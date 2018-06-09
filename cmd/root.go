@@ -55,7 +55,7 @@ func init() {
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.gofmt-att.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.gofmt-att.toml)")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
@@ -77,7 +77,11 @@ func initConfig() {
 
 		// Search config in home directory with name ".gofmt-att" (without extension).
 		viper.AddConfigPath(home)
+		viper.AddConfigPath("/etc/appname/")   // path to look for the config file in
+		viper.AddConfigPath(".")               // optionally look for config in the working directory
 		viper.SetConfigName(".gofmt-att")
+
+		viperSetDefaults()
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
@@ -85,5 +89,7 @@ func initConfig() {
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
+	} else {
+		fmt.Println("Not using config file")
 	}
 }
