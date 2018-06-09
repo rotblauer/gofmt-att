@@ -10,18 +10,12 @@ import (
 
 	"gopkg.in/src-d/go-git.v4"
 	gitConfig "gopkg.in/src-d/go-git.v4/config"
-	gitTransport "gopkg.in/src-d/go-git.v4/plumbing/transport"
 	gitObject "gopkg.in/src-d/go-git.v4/plumbing/object"
 	"time"
 	"os/exec"
 	"io/ioutil"
 	"flag"
 
-	"./gothub"
-	"gopkg.in/src-d/go-git.v4/plumbing"
-	"gopkg.in/src-d/go-git.v4/plumbing/storer"
-	"gopkg.in/src-d/go-git.v4/plumbing/filemode"
-	"gopkg.in/src-d/go-git.v4/plumbing/protocol/packp/sideband"
 	"golang.org/x/oauth2"
 )
 

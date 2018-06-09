@@ -8,7 +8,6 @@ import (
 	"io/ioutil"
 	"flag"
 
-	"./gothub"
 	"github.com/google/go-github/github"
 	"context"
 )
@@ -54,7 +53,7 @@ func getAllUserRepos(ctx context.Context, c *github.Client, user string) (repos 
 // }
 
 func main() {
-	ctx, client := gothub.NewGithubClientAndContext(GITHUB_TOKEN_TEST)
+	ctx, client := NewGithubClientAndContext(GITHUB_TOKEN_TEST)
 
 	// list all repositories for a user
 	// repos, _, err := client.Repositories.List(ctx, "whilei", nil)
