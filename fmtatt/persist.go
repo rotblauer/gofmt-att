@@ -1,6 +1,16 @@
 package fmtatt
 
-type HistoryProvider interface {
+type PersistenceConfig struct {
+	Name string // eg. bolt, kf, POST
+	Endpoint string // eg. path/to/database or HTTP endpoint
+}
+
+var DefaultPersistenceConfig = PersistenceConfig{
+	Name: "bolt",
+	Endpoint: "/var/gofmt-att.db",
+}
+
+type PersistenceProvider interface {
 	PutDidFmtOne(config Config, pr SimplePullRequestT) error
 	GetDidFmtOne(config Config, repo RepoSpec) (pr *SimplePullRequestT, err error)
 

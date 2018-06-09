@@ -22,6 +22,9 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"log"
+	"io"
+	"encoding/json"
+	"github.com/rotblauer/gofmt-att/fmtatt"
 )
 
 var cfgFile string
@@ -77,14 +80,11 @@ func initConfig() {
 
 		// Search config in home directory with name ".gofmt-att" (without extension).
 		viper.AddConfigPath(home)
-		viper.AddConfigPath("/etc/appname/")   // path to look for the config file in
+		viper.AddConfigPath("/etc/gofmt-att/")   // path to look for the config file in
 		viper.AddConfigPath(".")               // optionally look for config in the working directory
 
 		viper.SetConfigName(".gofmt-att")
-		viper.SetConfigType("toml")
-
-		// Set defaults.
-		viperSetDefaults()
+		viper.SetConfigType("json")
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
@@ -94,4 +94,13 @@ func initConfig() {
 		fmt.Println("Found config file:", viper.ConfigFileUsed())
 	}
 	// TODO else if not using create command, Fatal!
+}
+
+func writeDefaultConfig(w io.Writer) error {
+	b, err := json.MarshalIndent(&fmtatt.DefaultFmtAttConfig, "", "  ")
+	if err != nil {
+		log.Fatalln("could not marshal json:", err)
+	}
+	_, err = w.Write(b)
+	return err
 }

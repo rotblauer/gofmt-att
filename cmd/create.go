@@ -16,11 +16,12 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"github.com/mitchellh/go-homedir"
 	"log"
 	"path/filepath"
 	"fmt"
+	"io"
+	"os"
 )
 
 var forceWriteConfig bool
@@ -36,39 +37,44 @@ Otherwise, it will write to the default location at $HOME/.gofmt-att.toml`,
 	Run: func(cmd *cobra.Command, args []string) {
 
 		// Find home directory.
+		var err error
 		home, err := homedir.Dir()
 		if err != nil {
 			log.Fatalln(err)
 		}
-		wantFile := filepath.Join(home, ".gofmt-att.toml")
+
+		wantFile := filepath.Join(home, ".gofmt-att.json")
 		if len(args) > 0 {
-			wantFile = args[0]
+			wantFile = filepath.Clean(args[0])
 		}
-		var configWriter func(string) error
+
+		var f io.Writer
 		if forceWriteConfig {
-			configWriter = viper.WriteConfigAs
+			f, err = os.Create(wantFile)
+			if err != nil {
+				log.Fatalln(err)
+			}
 		} else {
-			configWriter = viper.SafeWriteConfigAs
+			stat, err := os.Stat(wantFile)
+			if err == nil {
+				log.Println("file exists:", stat.Name())
+			} else if !os.IsNotExist(err) {
+				log.Fatalln("error checking file:", err)
+			}
+			f, err = os.Open(wantFile)
+			if err != nil {
+				log.Fatalln(err)
+			}
 		}
-		if err := configWriter(wantFile); err != nil {
-			log.Fatalln("could not write default config file:", err)
-		} else {
-			fmt.Println("Wrote config file:", wantFile)
+		err = writeDefaultConfig(f)
+		if err != nil {
+			log.Fatalln("could not write json file:", err)
 		}
+		fmt.Println("Wrote config file:", wantFile)
 	},
 }
 
 func init() {
 	createCmd.PersistentFlags().BoolVar(&forceWriteConfig, "force", false, "overwrite any existing config file")
 	configCmd.AddCommand(createCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// createCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// createCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

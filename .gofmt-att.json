@@ -1,0 +1,77 @@
+{
+	"RepoProvider": "Github",
+	"Identity": {
+		"Username": "jlanej",
+		"RawToken": "",
+		"EnvToken": ""
+	},
+	"ReposFilter": {
+		"Owner": "rotblauer",
+		"Name": "gofmt-att",
+		"CloneUrl": "",
+		"GitUrl": "",
+		"Languages": [
+			"Go"
+		],
+		"IsFork": false,
+		"SortBy": "updated",
+		"OrderBy": "desc",
+		"Visibility": "visible"
+	},
+	"Fmt": [
+		{
+			"Commands": [
+				"gofmt -w"
+			],
+			"Target": "",
+			"PerFile": false,
+			"Files": {
+				"WhiteList": [
+					".go$"
+				],
+				"BlackList": [
+					""
+				]
+			},
+			"Dirs": {
+				"WhiteList": [
+					""
+				],
+				"BlackList": [
+					"*vendor*",
+					".git"
+				]
+			}
+		}
+	],
+	"PullRequestConfig": {
+		"Title": "gofmt: nice and clean. your's truly, the gofmt-att machine",
+		"Head": "",
+		"Base": "master",
+		"Body": "\nFormattered with :heart: by [gofmt-att](https://github.com/rotblauer/gofmt-att).\n\n\u003e If we got it wrong, or there's a bug or something, please [let us know](https://github.com/rotblauer/gofmt-att/issues/new).\n",
+		"BodyFile": ""
+	},
+	"PersistConfig": [
+		{
+			"Name": "bolt",
+			"Endpoint": "/var/gofmt-att.db"
+		}
+	],
+	"WalkPattern": {
+		"HumansWeight": 0.5,
+		"ReposWeight": 0.5,
+		"Distance": 1,
+		"Following": 0.3333333333333333,
+		"Followers": 0.3333333333333333,
+		"OrgMembers": 0.3333333333333333,
+		"Starred": 0.3333333333333333,
+		"Forked": 0.3333333333333333,
+		"Authored": 0.3333333333333333
+	},
+	"Logs": [
+		{
+			"Level": 3,
+			"Logger": "stderr"
+		}
+	]
+}

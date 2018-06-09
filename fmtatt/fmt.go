@@ -27,3 +27,16 @@ type FmtConfig struct {
 	Files FileList
 	Dirs FileList
 }
+
+var DefaultFmter = FmtConfig{
+		Commands: []string{"gofmt -w"},
+		Target: "",
+		Files: FileList{
+			WhiteList: []string{".go$"},
+			BlackList: []string{""},
+		},
+		Dirs: FileList{
+			WhiteList: []string{""},
+			BlackList: []string{"*vendor*", ".git"},
+		},
+}

@@ -2,7 +2,7 @@ package fmtatt
 
 // WalkProvider implements the logic required to select a next batch of repos to fetch.
 type WalkProvider interface {
-	StepNext(pattern WalkPattern, history HistoryProvider) (rs RepoListSpec, err error)
+	StepNext(pattern WalkPattern, history PersistenceProvider) (rs RepoListSpec, err error)
 }
 
 // WalkPattern decides how to select a next batch of repos of solve.
@@ -25,14 +25,30 @@ type WalkPattern struct {
 // WalkHumansPattern decides how to balance human connection variables when choosing
 // a next batch of repos to solve.
 type WalkHumansPattern struct {
-	Following bool
-	Followers bool
-	OrgMembers bool
+	Following float64
+	Followers float64
+	OrgMembers float64
 }
 
 // WalkReposPatterns decides how to balance repo list sources.
 type WalkReposPatterns struct {
-	Starred bool
-	Forked bool
-	Authored bool
+	Starred float64
+	Forked float64
+	Authored float64
+}
+
+var DefaultWalkPattern = WalkPattern{
+	HumansWeight: oneHalf,
+	ReposWeight: oneHalf,
+	Distance: 1,
+	WalkReposPatterns: WalkReposPatterns{
+		Starred: oneThird,
+		Forked: oneThird,
+		Authored: oneThird,
+	},
+	WalkHumansPattern: WalkHumansPattern{
+		Followers: oneThird,
+		Following: oneThird,
+		OrgMembers: oneThird,
+	},
 }
