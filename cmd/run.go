@@ -15,23 +15,24 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
+	"github.com/rotblauer/gofmt-att/fmtatt"
+	"github.com/spf13/viper"
+	"log"
 )
 
 // runCmd represents the run command
 var runCmd = &cobra.Command{
 	Use:   "run",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Runs shit.",
+	Long: ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("run called")
+		var c = &fmtatt.Config{}
+		err := viper.Unmarshal(&c)
+		if err != nil {
+			log.Fatalln("unable to decode into struct, %v", err)
+		}
+		fmtatt.New(c)
 	},
 }
 

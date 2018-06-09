@@ -18,9 +18,10 @@ import (
 	"fmt"
 	"os"
 
-	homedir "github.com/mitchellh/go-homedir"
+	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"log"
 )
 
 var cfgFile string
@@ -71,16 +72,18 @@ func initConfig() {
 		// Find home directory.
 		home, err := homedir.Dir()
 		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
+			log.Fatalln(err)
 		}
 
 		// Search config in home directory with name ".gofmt-att" (without extension).
 		viper.AddConfigPath(home)
 		viper.AddConfigPath("/etc/appname/")   // path to look for the config file in
 		viper.AddConfigPath(".")               // optionally look for config in the working directory
-		viper.SetConfigName(".gofmt-att")
 
+		viper.SetConfigName(".gofmt-att")
+		viper.SetConfigType("toml")
+
+		// Set defaults.
 		viperSetDefaults()
 	}
 
@@ -88,8 +91,7 @@ func initConfig() {
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
-	} else {
-		fmt.Println("Not using config file")
+		fmt.Println("Found config file:", viper.ConfigFileUsed())
 	}
+	// TODO else if not using create command, Fatal!
 }

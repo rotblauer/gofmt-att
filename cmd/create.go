@@ -15,37 +15,52 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/mitchellh/go-homedir"
+	"log"
+	"path/filepath"
+	"fmt"
 )
+
+var forceWriteConfig bool
 
 // createCmd represents the create command
 var createCmd = &cobra.Command{
 	Use:   "create",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Creates a config file from defaults",
+	Long: `And writes it in .toml.
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+If provided, an argument will be uses as the file path.
+Otherwise, it will write to the default location at $HOME/.gofmt-att.toml`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("create called")
-		viper.
-		viper.WriteConfig()
+
+		// Find home directory.
+		home, err := homedir.Dir()
+		if err != nil {
+			log.Fatalln(err)
+		}
+		wantFile := filepath.Join(home, ".gofmt-att.toml")
+		if len(args) > 0 {
+			wantFile = args[0]
+		}
+		var configWriter func(string) error
+		if forceWriteConfig {
+			configWriter = viper.WriteConfigAs
+		} else {
+			configWriter = viper.SafeWriteConfigAs
+		}
+		if err := configWriter(wantFile); err != nil {
+			log.Fatalln("could not write default config file:", err)
+		} else {
+			fmt.Println("Wrote config file:", wantFile)
+		}
 	},
 }
 
 func init() {
+	createCmd.PersistentFlags().BoolVar(&forceWriteConfig, "force", false, "overwrite any existing config file")
 	configCmd.AddCommand(createCmd)
-	if len(createCmd.ValidArgs) > 0 {
-		cfgFile = createCmd.ValidArgs[0]
-	}
-	// if len(*createCmd.Args) > 0 {
-	// 	cfgFile = createCmd.Args[0]
-	// }
 
 	// Here you will define your flags and configuration settings.
 

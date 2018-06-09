@@ -1,6 +1,10 @@
 package fmtatt
 
-type FmtAttConfig struct {
+import (
+	"log"
+)
+
+type Config struct {
 	RepoProvider      string
 	Identity          AuthIdentity // eg. whilei, ETCDEVTeam, etc.
 	ReposFilter       RepoListSpec
@@ -10,7 +14,7 @@ type FmtAttConfig struct {
 }
 
 type FmtAtt struct {
-	Config *FmtAttConfig
+	Config *Config
 
 	Repoer RepoProvider
 	Walker WalkProvider
@@ -18,4 +22,12 @@ type FmtAtt struct {
 	Giter GitProvider
 	Historyers []HistoryProvider
 
+}
+
+func New(c *Config) *FmtAtt {
+	log.Println("yep", c)
+
+
+
+	return nil
 }

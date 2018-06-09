@@ -18,20 +18,41 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"io/ioutil"
+	"log"
+	"github.com/spf13/viper"
+	"os"
+	"path/filepath"
+	"github.com/mitchellh/go-homedir"
 )
 
 // configCmd represents the config command
 var configCmd = &cobra.Command{
 	Use:   "config",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Echo default config to stderr.",
+	Long: ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("config called")
+		// FIXME this is a shitty workaround because for some crazy reason viper
+		// doesn't use an io.Writer for it's write config method.
+		// Find home directory.
+		home, err := homedir.Dir()
+		if err != nil {
+			log.Fatalln(err)
+		}
+		tempPath := filepath.Join(home, fmt.Sprintf("%s", ".tmp.gofmt-att.toml"))
+		err = ioutil.WriteFile(tempPath, []byte(""), os.ModePerm)
+		if err != nil {
+			log.Fatalln("can't create temp file:", err)
+		}
+		defer os.Remove(tempPath)
+		if err := viper.WriteConfigAs(tempPath); err != nil {
+			log.Fatalln("can't write config to temp file:", err)
+		}
+		b, err := ioutil.ReadFile(tempPath)
+		if err != nil {
+			log.Fatalln("cant read temp file:", err)
+		}
+		os.Stderr.Write(b)
 	},
 }
 
