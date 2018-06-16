@@ -10,8 +10,6 @@ please file an issue so this work can be as helpful and positive as possible.
 
 I've been running with some configured blacklisted regex's (like vendor/ dirs) to exclude from the `git add` portion to try to keep changes pertinent.
 
-> https://www.youtube.com/watch?v=PAAkCSZUG1c&t=8m43s
-
 Want to run it yourself? Cool!
 
 To run it, you need:
@@ -31,3 +29,4 @@ _More about configuration and other stuff._
 - You can spec a lot of other things. If you want to add a different repo provider than Github, use a different database (or "persisting" endpoint in general)... I've tried
 to make the architecture extensible.
 
+> Rob Pike touching on gofmt: https://www.youtube.com/watch?v=PAAkCSZUG1c&t=8m43s
