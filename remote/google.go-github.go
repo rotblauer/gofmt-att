@@ -298,6 +298,10 @@ func (rp *GoogleGithubRepoProvider) ForkRepo(config *ForkConfig, oR *RepoT) (ori
 	r, res, err = rp.client.Repositories.CreateFork(rp.ctx, oR.Owner.Name, oR.Name, &github.RepositoryCreateForkOptions{
 		Organization: config.Org,
 	})
+	if ok, e := wrapGHRespErr(res, err); !ok {
+		err = e
+		return
+	}
 
 	// This method might return an *AcceptedError and a status code of 202.
 	// This is because this is the status that GitHub returns to signify that it is now

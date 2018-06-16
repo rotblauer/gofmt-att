@@ -31,6 +31,9 @@ func wrapGHRespErr(res *github.Response, err error) (ok bool, ee error){
 		}
 		return
 	}
+	if res == nil {
+		ee = errors.New("nil response from github")
+	}
 	ok = true
 	return
 }
