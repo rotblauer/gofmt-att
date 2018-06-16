@@ -147,7 +147,10 @@ func (f *FmtAtt) Go(dryRun [3]DryRunT) {
 	ticker := time.Tick(30 * time.Second)
 	for {
 
-		for f.pause {}
+		// sketch as fuck
+		if f.pause {
+			time.Sleep(time.Duration(f.Config.Pacing.MininumPRSpreadMinutes)*time.Minute)
+		}
 
 		// water
 		if l := f.repoPool.Len(); l < repoQueueLowWater && atomic.LoadInt32(&fetching) == 0 {

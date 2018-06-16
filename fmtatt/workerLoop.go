@@ -113,7 +113,10 @@ func (f *FmtAtt) workerLoop() {
 
 	for r := range f.workerChan {
 		cloneQ <- 1
-		for f.pause {} // let any running workers finish up. kind of messy but whatever
+		// sketch as fuck
+		if f.pause {
+			time.Sleep(time.Duration(f.Config.Pacing.MininumPRSpreadMinutes)*time.Minute)
+		} // let any running workers finish up. kind of messy but whatever
 		o := f.mustGetRepoOutcome(r)
 		if o == nil {
 			f.Logger.E("no persisted outcome", r.String())
