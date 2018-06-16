@@ -90,8 +90,8 @@ func (f *FmtAtt) Go(dryRun [3]DryRunT) {
 	// set defaults
 	f.Logger.SetLevel(f.Config.Logs[0].Level) // yuck, cuz the multi-interfaces thing
 
+	var sigc = make(chan os.Signal, 1)
 	go func() {
-		var sigc = make(chan os.Signal, 1)
 		signal.Notify(sigc, os.Interrupt, syscall.SIGTERM)
 		defer signal.Stop(sigc)
 		sig := <-sigc
@@ -99,11 +99,8 @@ func (f *FmtAtt) Go(dryRun [3]DryRunT) {
 		f.quit <- struct{}{}
 	}()
 
-	pause := func(d time.Duration) {
-		f.pause = true
-		time.Sleep(d)
-		f.pause = false
-	}
+
+
 
 	printStatus := func(state persist.PersistentState) {
 		f.Logger.If("| PRs: %d", f.prsTally)
@@ -119,12 +116,38 @@ func (f *FmtAtt) Go(dryRun [3]DryRunT) {
 
 	printStatus(s)
 
-	ticker := time.Tick(30 * time.Second)
-	lastCheckedPRTally := 0
-	lastSleep := time.Now()
+	p := time.NewTimer(time.Duration(f.Config.Pacing.MininumPRSpreadMinutes)*time.Minute)
+	if f.Config.Pacing.MininumPRSpreadMinutes == 0 {
+		p.Stop()
+	}
+
+	go func() {
+		t := 0
+		for {
+			select {
+			case <-p.C:
+				t = f.prsTally
+				f.pause = false
+			default:
+				if f.prsTally > t && f.Config.Pacing.MininumPRSpreadMinutes > 0 {
+					f.pause = true
+					p.Reset(time.Duration(f.Config.Pacing.MininumPRSpreadMinutes)*time.Minute)
+					f.Logger.Wf("pausing %d minutes", f.Config.Pacing.MininumPRSpreadMinutes)
+				}
+				if f.Config.Pacing.MaxPRs > 0 && f.prsTally >= f.Config.Pacing.MaxPRs {
+					f.quit <- struct{}{}
+					<-f.quit // so our signaler can quit too
+					return
+				}
+			}
+		}
+	}()
 
 	var fetching int32
+	ticker := time.Tick(30 * time.Second)
 	for {
+
+		for f.pause {}
 
 		// water
 		if l := f.repoPool.Len(); l < repoQueueLowWater && atomic.LoadInt32(&fetching) == 0 {
@@ -201,20 +224,6 @@ func (f *FmtAtt) Go(dryRun [3]DryRunT) {
 			f.Logger.If("+ %s", rr.String())
 
 		case <-ticker:
-			// max out pr allowance
-			if f.Config.Pacing.MaxPRs > 0 && f.prsTally > f.Config.Pacing.MaxPRs {
-				f.quit<-struct{}{}
-				return
-			}
-			// pause for pr minimum interval
-			// noting that it's a ROUGH interval; max working pool allowance prs may still succeed
-			if f.prsTally > lastCheckedPRTally && (f.prIntervalMin > 0 && time.Since(lastSleep) > f.prIntervalMin){
-				f.Logger.W("%d PRs, sleeping %v", f.prIntervalMin.Round(time.Second))
-				f.Logger.W("be advised; goroutines will be allowed to finish their tasks")
-				pause(f.prIntervalMin)
-				lastCheckedPRTally = f.prsTally
-				lastSleep = time.Now()
-			}
 			state, err := f.Persister.GetStateLeafs()
 			if err != nil {
 				f.Logger.F(err)

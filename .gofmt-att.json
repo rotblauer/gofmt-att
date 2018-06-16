@@ -5,7 +5,7 @@
     "EnvToken": "GITHUB_TOKEN"
   },
   "Pacing": {
-    "MaxPRs": 50,
+    "MaxPRs": 10,
     "MininumPRSpreadMinutes": 10
   },
   "RepoProvider": "Github",

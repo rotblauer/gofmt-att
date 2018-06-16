@@ -99,6 +99,7 @@ func (f *FmtAtt) workerLoop() {
 
 	for r := range f.workerChan {
 		cloneQ <- 1
+		for f.pause {} // let any running workers finish up. kind of messy but whatever
 		o := f.mustGetRepoOutcome(r)
 		if o == nil {
 			f.Logger.E("no persisted outcome", r.String())

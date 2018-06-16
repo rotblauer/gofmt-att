@@ -129,6 +129,7 @@ func (g GoGit) CommitWithBranch(dirPath string, commit *GitCommitConfig) (hash, 
 	// set status for returnable (this will show the staged/unstaged changes)
 	status = stat.String()
 
+
 	// make commit
 	c, err := wt.Commit(fmt.Sprintf(`%s
 
@@ -144,6 +145,7 @@ func (g GoGit) CommitWithBranch(dirPath string, commit *GitCommitConfig) (hash, 
 		return
 	}
 	hash = c.String()
+
 
 	// set up branch ref name
 	refName := gitplumbing.ReferenceName("refs/heads/"+commit.BranchName)
