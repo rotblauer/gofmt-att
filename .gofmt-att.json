@@ -129,7 +129,8 @@
         "pkg",
         "test.*data",
         "assets",
-        "example"
+        "example",
+        "data"
       ]
     },
     "StripeList": [
