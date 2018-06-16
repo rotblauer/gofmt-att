@@ -69,7 +69,7 @@ func (f *FmtAtt) fetch(state persist.PersistentState) {
 	var filteredOwners = make(map[*remote.Owner]*remote.ErrFilteredT)
 
 	for _, ff := range fetched {
-		r, isRepo := f.Repoer.CastRepo(ff)
+		r, isRepo := f.Repoer.ToRepo(ff)
 		if isRepo {
 			ok, outcome, filterErr := f.filterRawRepo(r, ff)
 			f.mustPutRepoOutcome(r, outcome)
@@ -90,7 +90,7 @@ func (f *FmtAtt) fetch(state persist.PersistentState) {
 			}
 			continue
 		}
-		o, isOwner := f.Repoer.CastOwner(ff)
+		o, isOwner := f.Repoer.ToOwner(ff)
 		if !isOwner {
 			err = errors.New("failed to cast " + pretty.Sprint(ff))
 			break

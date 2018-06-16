@@ -166,7 +166,7 @@ func (f *FmtAtt) Go(dryRun [3]DryRunT) {
 			if err != nil {
 				f.Logger.E("ERR FETCHING REPO:", err.Error())
 			}
-			rr, ok := f.Repoer.CastRepo(raw)
+			rr, ok := f.Repoer.ToRepo(raw)
 			if !ok {
 				f.Logger.E("COULD NOT CAST:", pretty.Sprint(raw), "\nFROM:", wantRepo.String())
 				continue

@@ -84,7 +84,7 @@ func NewGoogleGithubProvider(username, token string) *GoogleGithubRepoProvider {
 	return gp
 }
 
-func (rp *GoogleGithubRepoProvider) CastRepo(rawRepo interface{}) (repo *RepoT, ok bool) {
+func (rp *GoogleGithubRepoProvider) ToRepo(rawRepo interface{}) (repo *RepoT, ok bool) {
 	r, ok := (rawRepo).(*github.Repository)
 	if !ok {
 		panic(pretty.Sprint(r))
@@ -92,7 +92,7 @@ func (rp *GoogleGithubRepoProvider) CastRepo(rawRepo interface{}) (repo *RepoT, 
 	}
 	repo = &RepoT{}
 	repo.Name = r.GetName()
-	if o, ok := rp.CastOwner(r.GetOwner()); ok {
+	if o, ok := rp.ToOwner(r.GetOwner()); ok {
 		repo.Owner = o
 	} else {
 		return repo, false
@@ -103,7 +103,7 @@ func (rp *GoogleGithubRepoProvider) CastRepo(rawRepo interface{}) (repo *RepoT, 
 	return repo, true
 }
 
-func (rp *GoogleGithubRepoProvider) CastOwner(rawOwner interface{}) (owner *Owner, ok bool) {
+func (rp *GoogleGithubRepoProvider) ToOwner(rawOwner interface{}) (owner *Owner, ok bool) {
 	o, ok := (rawOwner).(*github.User)
 	if ok {
 		return &Owner{
@@ -284,7 +284,7 @@ func (rp *GoogleGithubRepoProvider) ForkRepo(config *ForkConfig, oR *RepoT) (ori
 		if r != nil && r.GetGitURL() != "" {
 			fmt.Println("not forking; ", rp.username+"/"+oR.Name, "exists")
 			fmt.Println("--> ", r.GetHTMLURL())
-			forkR, ok := rp.CastRepo(r)
+			forkR, ok := rp.ToRepo(r)
 			if !ok {
 				panic("could not cast got repo")
 			}
@@ -324,7 +324,7 @@ func (rp *GoogleGithubRepoProvider) ForkRepo(config *ForkConfig, oR *RepoT) (ori
 		return
 	}
 
-	forkR, ok := rp.CastRepo(r)
+	forkR, ok := rp.ToRepo(r)
 	if !ok {
 		panic("could not cast repo")
 	}
