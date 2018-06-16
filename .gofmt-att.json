@@ -128,9 +128,11 @@
         "vendor",
         "pkg",
         "test.*data",
-        "assets",
+        "test\/",
+        "asset",
         "example",
-        "data"
+        "data\/",
+        "dep(|s)\/"
       ]
     },
     "StripeList": [
@@ -142,7 +144,7 @@
   },
   "PullRequestConfig": {
     "Title": "gofmt",
-    "Body": "\nJust ran\n\n\tgofmt -w .\n\non the project root. That's all.\n\nhttps://blog.golang.org/go-fmt-your-code\n\n---\n\u003e I made this PR with a project going on over at https://github.com/rotblauer/gofmt-att, and it's definitely a work in progress. So if I got something wrong, or this is annoying at all, please file an issue over there and we'll sort it out. On the other hand, if you think it's kind of funny like I do, please feel welcome to contribute or even fire up one of your own great automatic _gofmt_ers.",
+    "Body": "\nJust ran\n\n\tgofmt -w .\n\non the project root. That's all.\n\nhttps://blog.golang.org/go-fmt-your-code\n\n---\n\u003e I made this PR with a project going on over at https://github.com/rotblauer/gofmt-att, and it's definitely a work in progress. So if I got something wrong, or this is annoying at all, please file an issue over there and we'll sort it out.",
     "BodyFile": "",
     "OrgFork": ""
   },
