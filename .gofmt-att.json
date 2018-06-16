@@ -119,7 +119,7 @@
     "BasePath": "/Users/ia/gofmt-att/clones",
     "BranchNameBase": "gofmt",
     "Title": "all: gofmt",
-    "Body": "Run standard gofmt command on project root.\n\n- go version go1.10.3 darwin/amd64",
+    "Body": "Run standard gofmt command on project root.\n\n- go version go1.10.3 darwin/amd64\n\nSigned-off-by: ia <isaac.ardis@gmail.com>",
     "AuthorName": "ia",
     "Email": "isaac.ardis@gmail.com",
     "AddPaths": {
@@ -132,7 +132,8 @@
         "asset",
         "example",
         "data\/",
-        "dep(|s)\/"
+        "dep(|s)\/",
+        "bindata"
       ]
     },
     "StripeList": [
