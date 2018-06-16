@@ -298,10 +298,6 @@ func (rp *GoogleGithubRepoProvider) ForkRepo(config *ForkConfig, oR *RepoT) (ori
 	r, res, err = rp.client.Repositories.CreateFork(rp.ctx, oR.Owner.Name, oR.Name, &github.RepositoryCreateForkOptions{
 		Organization: config.Org,
 	})
-	if ok, e := wrapGHRespErr(res, err); !ok {
-		err = e
-		return
-	}
 
 	// This method might return an *AcceptedError and a status code of 202.
 	// This is because this is the status that GitHub returns to signify that it is now
@@ -309,7 +305,8 @@ func (rp *GoogleGithubRepoProvider) ForkRepo(config *ForkConfig, oR *RepoT) (ori
 	// In this event, the Repository value will be returned, which includes the details
 	// about the pending fork. A follow up request, after a delay of a second or so,
 	// should result in a successful request.
-	for res.StatusCode == 202 || strings.Contains(res.Status, "job scheduled") || strings.Contains(res.Status, "later") {
+	_, schedok := err.(*github.AcceptedError)
+	for schedok {
 		fmt.Println("sleeping for fork to happen")
 		// Forking a Repository happens asynchronously. Therefore, you may have to wait a short period before accessing the git objects. If this takes longer than 5 minutes, be sure to contact GitHub support.
 		time.Sleep(30*time.Second)
@@ -320,6 +317,7 @@ func (rp *GoogleGithubRepoProvider) ForkRepo(config *ForkConfig, oR *RepoT) (ori
 		fmt.Println("checking for user repo")
 		rp.reqCount++
 		_, res, err = rp.client.Repositories.Get(rp.ctx, own, oR.Name)
+		_, schedok = err.(*github.AcceptedError)
 	}
 	if ok, e := wrapGHRespErr(res, err); !ok {
 		err = e
