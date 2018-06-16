@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"time"
 	"github.com/kr/pretty"
+	"os/exec"
 )
 
 /*
@@ -83,6 +84,7 @@ func (f *FmtAtt) processRepo(r *remote.RepoT, outcome *remote.Outcome) (moarRepo
 	}
 
 	// commit and branch
+	// note that this will use the force and throw away unstaged changes
 	hash, status, err := f.Giter.CommitWithBranch(r.Target, f.Config.GitConfig.GitCommitConfig)
 	if err != nil {
 		return
@@ -90,6 +92,18 @@ func (f *FmtAtt) processRepo(r *remote.RepoT, outcome *remote.Outcome) (moarRepo
 	outcome.FormattedOutcome.GitStatus = status
 	outcome.FormattedOutcome.CommitHash= hash
 	outcome.Status = remote.Committed
+
+	// because only EOL changes is just annoying
+	nlc := exec.Command("git", "diff", "--ignore-space-at-eol", "HEAD~1..HEAD")
+	nlc.Dir = r.Target
+	b, err := nlc.CombinedOutput()
+	if err != nil {
+		return
+	}
+	// so if we didn't make any changes that weren't just EOL changes, call it clean
+	if len(b) == 0 {
+		outcome.Status = remote.Clean
+	}
 	return
 }
 
