@@ -75,6 +75,8 @@ type FmtAtt struct {
 	prIntervalMin time.Duration
 	prsTally int
 
+	fetching int32
+
 	persistentStateChanger func(st *persist.PersistentState, l remote.Leaf)
 
 	repoPool    *remote.RepoPool
@@ -116,82 +118,44 @@ func (f *FmtAtt) Go(dryRun [3]DryRunT) {
 
 	printStatus(s)
 
-	p := time.NewTimer(time.Duration(f.Config.Pacing.MininumPRSpreadMinutes)*time.Minute)
-	if f.Config.Pacing.MininumPRSpreadMinutes == 0 {
-		p.Stop()
-	}
+	// p := time.NewTimer(time.Duration(f.Config.Pacing.MininumPRSpreadMinutes)*time.Minute)
+	// if f.Config.Pacing.MininumPRSpreadMinutes == 0 {
+	// 	p.Stop()
+	// }
 
-	go func() {
-		t := 0
-		for {
-			select {
-			case <-p.C:
-				t = f.prsTally
-				f.pause = false
-			default:
-				if f.prsTally > t && f.Config.Pacing.MininumPRSpreadMinutes > 0 && !f.pause {
-					f.pause = true
-					p.Reset(time.Duration(f.Config.Pacing.MininumPRSpreadMinutes)*time.Minute)
-					f.Logger.Wf("pausing %d minutes", f.Config.Pacing.MininumPRSpreadMinutes)
-				}
-				if f.Config.Pacing.MaxPRs > 0 && f.prsTally >= f.Config.Pacing.MaxPRs {
-					f.quit <- struct{}{}
-					<-f.quit // so our signaler can quit too
-					return
-				}
-			}
-		}
-	}()
+	// go func() {
+	// 	t := 0
+	// 	for {
+	// 		select {
+	// 		case <-p.C:
+	// 			t = f.prsTally
+	// 			f.pause = false
+	// 		default:
+	// 			if f.prsTally > t && f.Config.Pacing.MininumPRSpreadMinutes > 0 && !f.pause {
+	// 				f.pause = true
+	// 				p.Reset(time.Duration(f.Config.Pacing.MininumPRSpreadMinutes)*time.Minute)
+	// 				f.Logger.Wf("pausing %d minutes", f.Config.Pacing.MininumPRSpreadMinutes)
+	// 			}
+	// 			if f.Config.Pacing.MaxPRs > 0 && f.prsTally >= f.Config.Pacing.MaxPRs {
+	// 				f.quit <- struct{}{}
+	// 				<-f.quit // so our signaler can quit too
+	// 				return
+	// 			}
+	// 		}
+	// 	}
+	// }()
 
-	var fetching int32
+	go f.supervisor()
+
 	ticker := time.Tick(30 * time.Second)
 	for {
 
-		// sketch as fuck
-		if f.pause {
-			time.Sleep(time.Duration(f.Config.Pacing.MininumPRSpreadMinutes)*time.Minute)
-		}
-
-		// water
-		if l := f.repoPool.Len(); l < repoQueueLowWater && atomic.LoadInt32(&fetching) == 0 {
-			// gotta query
-			// get state
-			state, err := f.Persister.GetStateLeafs()
-			if err != nil {
-				panic(err)
-			}
-
-			// replenish our owner pool if necessary
-			if f.ownerPool.Len() <= 1 {
-				os, err := f.Persister.GetOwners()
-				if err != nil {
-					f.Logger.F(err)
-				}
-				for i := 0; i < 10; i++ {
-					f.ownerPool.Push(os[i])
-				}
-			}
-
-			step := f.Walker.StepNext(f.Config.WalkPattern, state, walk.Step{Leaf: state.Current}, f.ownerPool, f.repoPool)
-			if step.Err != nil {
-				f.Logger.E("step err:", step.Err)
-				continue
-			}
-
-			// get next step
-			state, err = f.Persister.PutCurrentLeaf(step.Leaf, f.persistentStateChanger)
-			if err != nil {
-				f.Logger.F(err)
-			}
-			f.doFetchChan <- state
-		}
-
 		select {
 		case state := <-f.doFetchChan:
-			atomic.StoreInt32(&fetching, 1)
+			atomic.StoreInt32(&f.fetching, 1)
 			f.fetch(state)
 			//  f.workerChan <- [filtered repos]
-			atomic.StoreInt32(&fetching, 0)
+			atomic.StoreInt32(&f.fetching, 0)
 
 		case struc := <- f.contributorChan:
 			f.Logger.I("contributor channel received %s %s", struc.r.String(), struc.o.String())
@@ -245,6 +209,44 @@ func (f *FmtAtt) Go(dryRun [3]DryRunT) {
 			return
 
 		default:
+		}
+	}
+}
+
+func (f *FmtAtt) supervisor() {
+	for !f.quitting {
+		// water
+		if l := f.repoPool.Len(); l < repoQueueLowWater && atomic.LoadInt32(&f.fetching) == 0 {
+			// gotta query
+			// get state
+			state, err := f.Persister.GetStateLeafs()
+			if err != nil {
+				panic(err)
+			}
+
+			// replenish our owner pool if necessary
+			if f.ownerPool.Len() <= 1 {
+				os, err := f.Persister.GetOwners()
+				if err != nil {
+					f.Logger.F(err)
+				}
+				for i := 0; i < 10; i++ {
+					f.ownerPool.Push(os[i])
+				}
+			}
+
+			step := f.Walker.StepNext(f.Config.WalkPattern, state, walk.Step{Leaf: state.Current}, f.ownerPool, f.repoPool)
+			if step.Err != nil {
+				f.Logger.E("step err:", step.Err)
+				continue
+			}
+
+			// get next step
+			state, err = f.Persister.PutCurrentLeaf(step.Leaf, f.persistentStateChanger)
+			if err != nil {
+				f.Logger.F(err)
+			}
+			f.doFetchChan <- state
 		}
 	}
 }

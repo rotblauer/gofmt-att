@@ -113,20 +113,22 @@ func (f *FmtAtt) workerLoop() {
 
 	for r := range f.workerChan {
 		cloneQ <- 1
+		r := r
 		// sketch as fuck
-		if f.pause {
-			time.Sleep(time.Duration(f.Config.Pacing.MininumPRSpreadMinutes)*time.Minute)
-		} // let any running workers finish up. kind of messy but whatever
-		o := f.mustGetRepoOutcome(r)
-		if o == nil {
+		// if f.pause {
+		// 	time.Sleep(time.Duration(f.Config.Pacing.MininumPRSpreadMinutes)*time.Minute)
+		// } // let any running workers finish up. kind of messy but whatever
+		outcome := f.mustGetRepoOutcome(r)
+		if outcome == nil {
 			f.Logger.E("no persisted outcome", r.String())
+			f.teardown(r)
+			f.repoPool.Remove(r)
 			<-cloneQ
 			continue
 		}
-		go func(r *remote.RepoT, outcome *remote.Outcome) {
+		go func() {
 			f.workingPool.push(r)
 			stripedRepos, err := f.processRepo(r, outcome)
-			f.mustPutRepoOutcome(r, outcome)
 			f.Logger.I("finished processing")
 			f.Logger.If("%s %s", r.String(), outcome.String())
 			if err != nil {
@@ -135,6 +137,7 @@ func (f *FmtAtt) workerLoop() {
 				f.Logger.E(pretty.Sprint(r))
 				f.Logger.E(pretty.Sprint(outcome))
 			}
+			f.mustPutRepoOutcome(r, outcome)
 			for _, rr := range stripedRepos {
 				f.Logger.If("++ %s %s", rr.String())
 				f.striperChan <- rr
@@ -151,9 +154,9 @@ func (f *FmtAtt) workerLoop() {
 			} else {
 				f.teardown(r)
 			}
-			<-cloneQ
 			f.workingPool.splice(r)
-		}(r, o)
+			<-cloneQ
+		}()
 	}
 	f.Logger.W("quitting worker loop")
 }
