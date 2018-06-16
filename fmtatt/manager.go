@@ -129,7 +129,7 @@ func (f *FmtAtt) Go(dryRun [3]DryRunT) {
 				t = f.prsTally
 				f.pause = false
 			default:
-				if f.prsTally > t && f.Config.Pacing.MininumPRSpreadMinutes > 0 {
+				if f.prsTally > t && f.Config.Pacing.MininumPRSpreadMinutes > 0 && !f.pause {
 					f.pause = true
 					p.Reset(time.Duration(f.Config.Pacing.MininumPRSpreadMinutes)*time.Minute)
 					f.Logger.Wf("pausing %d minutes", f.Config.Pacing.MininumPRSpreadMinutes)
