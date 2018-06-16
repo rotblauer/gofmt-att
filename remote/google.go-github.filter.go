@@ -1,8 +1,9 @@
 package remote
 
 import (
-	"github.com/google/go-github/github"
 	"regexp"
+
+	"github.com/google/go-github/github"
 )
 
 func (rp *GoogleGithubRepoProvider) FilterRepo(rawRepo interface{}, spec *RepoListSpec) (err *ErrFilteredT) {
@@ -65,7 +66,7 @@ func (rp *GoogleGithubRepoProvider) FilterRepo(rawRepo interface{}, spec *RepoLi
 
 func (rp *GoogleGithubRepoProvider) FilterOwner(rawOwner interface{}, spec *OwnerListSpec) (err *ErrFilteredT) {
 	owner := (rawOwner).(*github.User)
-	wantName := rp.ownerSpecs.Owner.Name
+	wantName := spec.Owner.Name
 	if wantName != "" {
 		re := regexp.MustCompile(wantName)
 		if !re.MatchString(owner.GetLogin()) {
@@ -78,9 +79,9 @@ func (rp *GoogleGithubRepoProvider) FilterOwner(rawOwner interface{}, spec *Owne
 		}
 	}
 
-	if rp.ownerSpecs.Hireable != "" {
+	if spec.Hireable != "" {
 		gotHirable := owner.GetHireable()
-		wantHirable := rp.ownerSpecs.Hireable == "true"
+		wantHirable := spec.Hireable == "true"
 		if gotHirable != wantHirable {
 			err = &ErrFilteredT{
 				Reason:   "hireable",
@@ -91,19 +92,19 @@ func (rp *GoogleGithubRepoProvider) FilterOwner(rawOwner interface{}, spec *Owne
 		}
 	}
 
-	if err = filterNSpec("user", rp.ownerSpecs.PublicGistsN, owner.GetPublicGists()); err != nil {
+	if err = filterNSpec("user", spec.PublicGistsN, owner.GetPublicGists()); err != nil {
 		return
 	}
-	if err = filterNSpec("user", rp.ownerSpecs.PublicReposN, owner.GetPublicRepos()); err != nil {
+	if err = filterNSpec("user", spec.PublicReposN, owner.GetPublicRepos()); err != nil {
 		return
 	}
-	if err = filterNSpec("user", rp.ownerSpecs.FollowersN, owner.GetFollowers()); err != nil {
+	if err = filterNSpec("user", spec.FollowersN, owner.GetFollowers()); err != nil {
 		return
 	}
-	if err = filterNSpec("user", rp.ownerSpecs.FollowingN, owner.GetFollowing()); err != nil {
+	if err = filterNSpec("user", spec.FollowingN, owner.GetFollowing()); err != nil {
 		return
 	}
-	if err = filterNSpec("user", rp.ownerSpecs.CollaboratorsN, owner.GetCollaborators()); err != nil {
+	if err = filterNSpec("user", spec.CollaboratorsN, owner.GetCollaborators()); err != nil {
 		return
 	}
 	return

@@ -1,13 +1,14 @@
 package walk
 
 import (
-	"sync"
-	"github.com/rotblauer/gofmt-att/remote"
-	"math/rand"
-	"time"
-	"github.com/rotblauer/gofmt-att/persist"
 	"fmt"
+	"math/rand"
 	"reflect"
+	"sync"
+	"time"
+
+	"github.com/rotblauer/gofmt-att/persist"
+	"github.com/rotblauer/gofmt-att/remote"
 )
 
 type DrunkenWalker struct {
@@ -27,7 +28,6 @@ func (wp DrunkenWalker) StepNext(pattern *WalkPattern, state persist.PersistentS
 	next = Step{}
 	next.Leaf.Header = last.Leaf.Header
 	next.Leaf.ID = last.Leaf.ID
-
 
 	returnToGenesis := func(e error) {
 		fmt.Printf("--------- RETURNING TO GENESIS: %v -----------\n", e.Error())
@@ -62,7 +62,7 @@ func (wp DrunkenWalker) StepNext(pattern *WalkPattern, state persist.PersistentS
 			next.Leaf.ID = o.Name // this can be overridden if leaf requires repo endpoint
 		}
 
-		h, ok := drunkenGetLeafWeighted(wp.WalkPattern, remote.Branches[last.Leaf.Header]...)
+		h, ok := drunkenGetLeafWeighted(wp.WalkPattern, remote.AvailableLeafHeaders...)
 		if !ok {
 			returnToGenesis(errDeadEnd)
 			return
@@ -130,7 +130,7 @@ func drunkenGetLeafWeighted(pattern *WalkPattern, leafs ...remote.LeafHeader) (l
 		panic("NO SUM NO GOOD")
 		return
 	}
-	rat := 1/sum
+	rat := 1 / sum
 	if rat < 1 {
 		panic("baaaad config. all configs vals together should add to one, with caveats")
 	}

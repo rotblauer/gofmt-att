@@ -12,6 +12,7 @@ import (
 
 func (f *FmtAtt) teardown(r *remote.RepoT) error {
 	f.Logger.I("teardown", r.String())
+	defer f.repoPool.Remove(r)
 	if _, err := os.Stat(r.Target); err == nil {
 		f.Logger.D("removing", r.Target)
 		if e := os.RemoveAll(r.Target); e != nil {
@@ -25,10 +26,8 @@ func (f *FmtAtt) teardown(r *remote.RepoT) error {
 		if len(ds) == 0 {
 			f.Logger.D("removing", ownerFolder)
 			return os.RemoveAll(ownerFolder)
-
 		}
 	}
-	f.repoPool.Remove(r)
 	// if only repo from that owner, splice him from owner pool
 	if rs := f.repoPool.GetWhere(func(rr *remote.RepoT, o *remote.Outcome) bool {
 		return rr.Owner.Name == r.Owner.Name
@@ -94,6 +93,7 @@ func (f *FmtAtt) add(r *remote.RepoT, outcome *remote.Outcome, status string) (a
 			for _, re := range blacks {
 				if re.MatchString(line) {
 					// don't add line
+					f.Logger.D("skipping blacklisted line: %s", line)
 					continue lines
 				}
 			}

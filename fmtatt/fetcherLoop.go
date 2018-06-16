@@ -92,7 +92,7 @@ func (f *FmtAtt) fetch(state persist.PersistentState) {
 		}
 		o, isOwner := f.Repoer.ToOwner(ff)
 		if !isOwner {
-			err = errors.New("failed to cast " + pretty.Sprint(ff))
+			err = errors.New("failed to assert type " + pretty.Sprint(ff))
 			break
 		}
 		filterErr := f.Repoer.FilterOwner(ff, f.Config.ReposSpec.OwnerListSpec)
@@ -109,7 +109,7 @@ func (f *FmtAtt) fetch(state persist.PersistentState) {
 	// loggers
 	if err != nil {
 		// failed to cast
-		f.Logger.Ef("ERR FETCHER CASTER = %v", err)
+		f.Logger.Ef("ERR FETCHER TYPE ASSERTER = %v", err)
 	}
 
 	for o, e := range filteredOwners {

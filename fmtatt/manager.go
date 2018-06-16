@@ -101,9 +101,6 @@ func (f *FmtAtt) Go(dryRun [3]DryRunT) {
 		f.quit <- struct{}{}
 	}()
 
-
-
-
 	printStatus := func(state persist.PersistentState) {
 		f.Logger.If("| PRs: %d", f.prsTally)
 		f.Logger.If("| pool:working=%d %v", f.workingPool.len(), f.workingPool)
@@ -168,7 +165,7 @@ func (f *FmtAtt) Go(dryRun [3]DryRunT) {
 			}
 			rr, ok := f.Repoer.ToRepo(raw)
 			if !ok {
-				f.Logger.E("COULD NOT CAST:", pretty.Sprint(raw), "\nFROM:", wantRepo.String())
+				f.Logger.E("COULD NOT ASSERT TYPE:", pretty.Sprint(raw), "\nFROM:", wantRepo.String())
 				continue
 			}
 			ok, outcome, filterErr := f.filterRawRepo(rr, raw)
@@ -216,7 +213,7 @@ func (f *FmtAtt) Go(dryRun [3]DryRunT) {
 func (f *FmtAtt) supervisor() {
 	for !f.quitting {
 		// water
-		if l := f.repoPool.Len(); l < repoQueueLowWater && atomic.LoadInt32(&f.fetching) == 0 {
+		if (f.repoPool.Len() < repoQueueLowWater || f.workingPool.len() < cloningWorkLimit) && atomic.LoadInt32(&f.fetching) == 0 {
 			// gotta query
 			// get state
 			state, err := f.Persister.GetStateLeafs()

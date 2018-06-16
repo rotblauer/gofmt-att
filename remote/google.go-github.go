@@ -2,14 +2,14 @@ package remote
 
 import (
 	"context"
-	"github.com/google/go-github/github"
-	"golang.org/x/oauth2"
-	"strings"
-	"time"
+	"errors"
 	"fmt"
 	"net/http"
-	"errors"
-	"github.com/kr/pretty"
+	"strings"
+	"time"
+
+	"github.com/google/go-github/github"
+	"golang.org/x/oauth2"
 )
 
 const PerPage = 50 // 100 is max
@@ -18,16 +18,16 @@ const PageMax = 2
 // GoogleGithubRepoProvider implements the Provider interface using the google/go-github API package.
 type GoogleGithubRepoProvider struct {
 	client     *github.Client
-	httpC *http.Client
+	httpC      *http.Client
 	ctx        context.Context
 	username   string
 	ownerSpecs *OwnerListSpec
 	repoSpec   *RepoListSpec
 	throttle   <-chan time.Time
-	throttleD time.Duration
-	startedAt time.Time
-	reqCount  int
-	quitting bool
+	throttleD  time.Duration
+	startedAt  time.Time
+	reqCount   int
+	quitting   bool
 }
 
 func NewGoogleGithubProvider(username, token string) *GoogleGithubRepoProvider {
@@ -38,10 +38,10 @@ func NewGoogleGithubProvider(username, token string) *GoogleGithubRepoProvider {
 	tc := oauth2.NewClient(ctx, ts)
 	ghc := github.NewClient(tc)
 
-	startingRate := 1*time.Second
+	startingRate := 1 * time.Second
 	gp := &GoogleGithubRepoProvider{
 		client:    ghc,
-		httpC: tc,
+		httpC:     tc,
 		ctx:       ctx,
 		username:  username,
 		throttle:  time.Tick(startingRate),
@@ -55,7 +55,7 @@ func NewGoogleGithubProvider(username, token string) *GoogleGithubRepoProvider {
 		// calc max rate
 		max := int64(5000)
 		safeMaxPerMin := max / 10 / 60 // just to be safe...
-		ticker := time.NewTicker(30*time.Second)
+		ticker := time.NewTicker(30 * time.Second)
 		for range ticker.C {
 			fmt.Printf("(api requests=%d) repo provider heartbeat\n", gp.reqCount)
 			if gp.quitting {
@@ -68,10 +68,10 @@ func NewGoogleGithubProvider(username, token string) *GoogleGithubRepoProvider {
 				continue
 			}
 			if rate := int64(gp.reqCount) / int64(minutesRunning); rate > safeMaxPerMin {
-				gp.throttleD += 500*time.Millisecond
+				gp.throttleD += 500 * time.Millisecond
 				gp.throttle = time.Tick(gp.throttleD)
 			} else if rate < safeMaxPerMin/2 {
-				gp.throttleD -= 500*time.Millisecond
+				gp.throttleD -= 500 * time.Millisecond
 				gp.throttle = time.Tick(gp.throttleD)
 			}
 
@@ -87,7 +87,7 @@ func NewGoogleGithubProvider(username, token string) *GoogleGithubRepoProvider {
 func (rp *GoogleGithubRepoProvider) ToRepo(rawRepo interface{}) (repo *RepoT, ok bool) {
 	r, ok := (rawRepo).(*github.Repository)
 	if !ok {
-		panic(pretty.Sprint(r))
+		// panic(pretty.Sprint(r))
 		return nil, ok
 	}
 	repo = &RepoT{}
@@ -107,9 +107,8 @@ func (rp *GoogleGithubRepoProvider) ToOwner(rawOwner interface{}) (owner *Owner,
 	o, ok := (rawOwner).(*github.User)
 	if ok {
 		return &Owner{
-			Name: o.GetLogin(),
+			Name:   o.GetLogin(),
 			KindOf: o.GetType(),
-
 		}, true
 	}
 	return nil, ok
@@ -309,7 +308,7 @@ func (rp *GoogleGithubRepoProvider) ForkRepo(config *ForkConfig, oR *RepoT) (ori
 	for schedok {
 		fmt.Println("sleeping for fork to happen")
 		// Forking a Repository happens asynchronously. Therefore, you may have to wait a short period before accessing the git objects. If this takes longer than 5 minutes, be sure to contact GitHub support.
-		time.Sleep(30*time.Second)
+		time.Sleep(30 * time.Second)
 		own := rp.username
 		if config.Org != "" {
 			own = config.Org
@@ -337,7 +336,7 @@ func (rp *GoogleGithubRepoProvider) CreatePullRequest(pr *PullRequestT, branchNa
 	rp.reqCount++
 	// check for open prs matching what we're about to make.
 	// NO DUPLICATE PRs!
-	prs, res, err := rp.client.PullRequests.List(rp.ctx, pr.Owner.Name, pr.Name, &github.PullRequestListOptions{ListOptions: github.ListOptions{PerPage:PageMax}}) // State:"open" // either, really, at this point
+	prs, res, err := rp.client.PullRequests.List(rp.ctx, pr.Owner.Name, pr.Name, &github.PullRequestListOptions{ListOptions: github.ListOptions{PerPage: PageMax}}) // State:"open" // either, really, at this point
 	if ok, e := wrapGHRespErr(res, err); !ok {
 		if len(prs) != 0 {
 			err = e
@@ -378,6 +377,5 @@ func (rp *GoogleGithubRepoProvider) CreatePullRequest(pr *PullRequestT, branchNa
 	pr.Number = githubPR.GetNumber()
 	pr.ID = githubPR.GetID()
 	return
-
 
 }
