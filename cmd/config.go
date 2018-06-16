@@ -15,19 +15,20 @@
 package cmd
 
 import (
+	"github.com/rotblauer/gofmt-att/fmtatt"
 	"github.com/spf13/cobra"
-	"os"
 	"io"
-	"encoding/json"
-	"github.com/rotblauer/gofmt-att/common"
+	"os"
+
 	"log"
+	"encoding/json"
 )
 
 // configCmd represents the config command
 var configCmd = &cobra.Command{
 	Use:   "config",
 	Short: "Echo default config to stderr.",
-	Long: ``,
+	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		writeDefaultConfig(os.Stderr)
 	},
@@ -38,10 +39,17 @@ func init() {
 }
 
 func writeDefaultConfig(w io.Writer) error {
-	b, err := json.MarshalIndent(&common.DefaultFmtAttConfig, "", "  ")
+	c := fmtatt.DefaultFmtAttConfig
+	// b, err := yaml.Marshal(c)
+	// b, err := toml.Marshal(c)
+	b, err := json.MarshalIndent(c, "", "  ")
 	if err != nil {
+		panic(err)
 		log.Fatalln("could not marshal json:", err)
 	}
 	_, err = w.Write(b)
 	return err
+
+	// enc := toml.NewEncoder(w)
+	// return enc.Encode(c)
 }

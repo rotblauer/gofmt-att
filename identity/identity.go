@@ -1,4 +1,4 @@
-package fmtatt
+package identity
 
 type AuthIdentity struct {
 	Username string

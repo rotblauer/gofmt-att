@@ -1,4 +1,4 @@
-package fmtatt
+package sketches
 
 import (
 	"context"
@@ -65,13 +65,38 @@ func main() {
 
 	// list all repositories for a user
 	repos, _, err := client.Repositories.List(ctx, "whilei", nil)
-	if err != nil {
+	// client.Repositories.ListAll() //all public
+	// client.Repositories.ListAllTopics() // ListAllTopics lists topics for a repositor
+	client.Repositories.ListLanguages()
+	// ListLanguages lists languages for the specified repository. The returned map specifies the languages and the number of bytes of code written in that language. For example:
+	// {
+	// 	"C": 78769,
+	// 	"Python": 7769
+	// }
+	jeff, _, err := client.Users.Get(ctx, "jeff")
+	// jeff.
+	rot, _, err := client.Organizations.Get("rotblauer")
+	client.Search.U
+	// type SearchOptions struct {
+		// Sort string `url:"sort,omitempty"`
+		// Order string `url:"order,omitempty"`
+		// TextMatch bool `url:"-"` <- false
+		// ListOptions <- app internal
+
+		// client.Search.Repositories(ctx, "jeff", )
+		client.Search.Users()
+	// rot.
+	// 	client.Search.Repositories()
+
+		if err != nil {
 		log.Fatalln(err)
 	}
+	client.Repositories.List
 	for _, repo := range repos {
 		if !repo.GetFork() && repo.GetLanguage() == "Go" {
 			fmt.Println(repo.GetCloneURL())
 			fmt.Println(repo.GetGitURL())
+
 		}
 	}
 
@@ -132,10 +157,13 @@ func main() {
 			When:  time.Now(),
 		},
 	})
+
 	r.CreateRemote(&gitConfig.RemoteConfig{
-		Name: "whilei",
+		Name: "rotblauer",
 		URLs: []string{forkGitRemote},
 	})
+
+	r.CreateBranch()
 
 
 	// type PushOptions struct {
@@ -145,15 +173,15 @@ func main() {
 	// 	Progress sideband.Progress
 	// }
 	if err := r.Push(&git.PushOptions{
-		RemoteName: "origin",
+		RemoteName: "rotblauer",
 		RefSpecs: []gitConfig.RefSpec{"+refs/heads/*:refs/remotes/origin/*"},
-		Auth:
+		Auth: // todo?
 	}); err != nil {
 		// handle error
 	}
 
 	exec.Command("gofmt ...")
-	// if err := r.Push(&git.PushOptions{
+	// if err := r.Set(&git.PushOptions{
 	// 	// RemoteName is the name of the remote to be pushed to.
 	// 	RemoteName: "origin",
 	// 	// RefSpecs specify what destination ref to update with what source

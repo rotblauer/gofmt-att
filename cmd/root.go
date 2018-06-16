@@ -77,7 +77,7 @@ func initConfig() {
 
 		// Search config in home directory with name ".gofmt-att" (without extension).
 		viper.AddConfigPath(home)
-		viper.AddConfigPath("/etc/gofmt-att/")   // path to look for the config file in
+		viper.AddConfigPath("/etc/gofmt-att/") // path to look for the config file in
 		viper.AddConfigPath(".")               // optionally look for config in the working directory
 
 		viper.SetConfigName(".gofmt-att")
@@ -89,7 +89,8 @@ func initConfig() {
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Found config file:", viper.ConfigFileUsed())
+	} else {
+		fmt.Println("!! Did not read config file:", viper.ConfigFileUsed())
 	}
 	// TODO else if not using create command, Fatal!
 }
-

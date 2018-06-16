@@ -1,15 +1,15 @@
-package fmtatt
+package sketches
 
 import (
 	"fmt"
 	"log"
 	"os"
 
-	"io/ioutil"
 	"flag"
+	"io/ioutil"
 
-	"github.com/google/go-github/github"
 	"context"
+	"github.com/google/go-github/github"
 )
 
 var (

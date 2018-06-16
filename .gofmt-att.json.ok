@@ -13,11 +13,11 @@
     "Sort": "updated",
     "Order": "desc",
     "OwnerType": "",
-    "Visibility": "all",
+    "Visibility": "asdfasdfasdfasdfasdfasdf",
     "Affiliation": "owner,collaborator,organization_member",
     "Owner": {
-      "WhiteList": [],
-      "BlackList": ["oogle"]
+      "WhiteList": ["teasdfasdfasdfasdfst"],
+      "BlackList": []
     },
     "Name": {
       "WhiteList": [],
@@ -25,9 +25,12 @@
     },
     "Language": {
       "WhiteList": [
-        "Go"
+        "Go",
+        "asdfasdfasdfasdf"
       ],
-      "BlackList": []
+      "BlackList": [
+        "Javascript"
+      ]
     },
     "Conduct": {
       "WhiteList": [],
@@ -38,30 +41,32 @@
     },
     "Description": {
       "WhiteList": [],
-      "BlackList": []
+      "BlackList": [
+        "simple"
+      ]
     },
     "IsFork": false,
     "IsPrivate": false,
     "Archived": false,
     "StargazersCount": {
       "Min": 0,
-      "Max": 4294967295
+      "Max": 42
     },
     "ForksCount": {
       "Min": 0,
-      "Max": 4294967295
+      "Max": 42
     },
     "WatchersCount": {
       "Min": 0,
-      "Max": 4294967295
+      "Max": 542
     },
     "NetworkCount": {
       "Min": 0,
-      "Max": 4294967295
+      "Max": 12
     },
     "Size": {
       "Min": 0,
-      "Max": 10200
+      "Max": 51200
     },
     "CreatedAt": null,
     "UpdatedAt": null,
@@ -69,23 +74,23 @@
     "KindOf": "",
     "FollowingN": {
       "Min": 0,
-      "Max": 4294967295
+      "Max": 42
     },
     "FollowersN": {
       "Min": 0,
-      "Max": 4294967295
+      "Max": 42
     },
     "PublicReposN": {
       "Min": 0,
-      "Max": 4294967295
+      "Max": 42
     },
     "PublicGistsN": {
       "Min": 0,
-      "Max": 4294967295
+      "Max": 42
     },
     "CollaboratorsN": {
       "Min": 0,
-      "Max": 4294967295
+      "Max": 42
     },
     "Hireable": ""
   },
@@ -97,7 +102,7 @@
       "PerFile": false,
       "Files": {
         "WhiteList": [
-          ".go$"
+          ".go$$$$$"
         ],
         "BlackList": [
           ""
@@ -116,7 +121,7 @@
   ],
   "GitConfig": {
     "Provider": "gogit",
-    "BasePath": "/Users/ia/gofmt-att/clones",
+    "BasePath": "/Users/ia/gofmt-att/clonasdfasdfffffffffffffffffffffffffffffffffffes",
     "BranchNameBase": "gofmt",
     "Title": "all: gofmt",
     "Body": "Run standard gofmt command on project root.\n\n- go version go1.10.3 darwin/amd64",
@@ -125,11 +130,10 @@
     "AddPaths": {
       "WhiteList": [],
       "BlackList": [
-        "vendor",
-        "pkg",
-        "test.*data",
-        "assets",
-        "example"
+        "vendor\\/",
+        "pkg\\/",
+        "testdata",
+        "assets\\/"
       ]
     },
     "StripeList": [
@@ -141,7 +145,7 @@
   },
   "PullRequestConfig": {
     "Title": "gofmt",
-    "Body": "\nJust ran\n\n\tgofmt -w .\n\non the project root. That's all.\n\n\u003e https://blog.golang.org/go-fmt-your-code\n",
+    "Body": "\nJust ran\n\n\tgofmt -w .\n\non the asdfasdfasdfasdfasdfasdfasdfproject root. That's all.\n\n\u003e https://blog.golang.org/go-fmt-your-code\n",
     "BodyFile": "",
     "OrgFork": ""
   },
@@ -154,8 +158,8 @@
   "WalkPattern": {
     "Name": "drunken",
     "Genesis": {
-      "Header": "user_starred",
-      "ID": "whilei"
+      "Header": "org_owns",
+      "ID": "rotblauer"
     },
     "QueryBranchConfig": {
       "MaxDistance": 60000,

@@ -15,13 +15,13 @@
 package cmd
 
 import (
-	"github.com/spf13/cobra"
-	"github.com/mitchellh/go-homedir"
-	"log"
-	"path/filepath"
 	"fmt"
+	"github.com/mitchellh/go-homedir"
+	"github.com/spf13/cobra"
 	"io"
+	"log"
 	"os"
+	"path/filepath"
 )
 
 var forceWriteConfig bool
@@ -47,6 +47,12 @@ Otherwise, it will write to the default location at $HOME/.gofmt-att.toml`,
 		if len(args) > 0 {
 			wantFile = filepath.Clean(args[0])
 		}
+
+		absWant, e := filepath.Abs(wantFile)
+		if e != nil {
+			log.Fatalln(e)
+		}
+		wantFile = absWant
 
 		var f io.Writer
 		if forceWriteConfig {

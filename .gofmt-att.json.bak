@@ -12,34 +12,36 @@
   "ReposSpec": {
     "Sort": "updated",
     "Order": "desc",
+    "Owner": {
+      "WhiteList": null,
+      "BlackList": [
+        "oogle"
+      ]
+    },
+    "Name": {
+      "WhiteList": null,
+      "BlackList": [
+        "oogl"
+      ]
+    },
     "OwnerType": "",
     "Visibility": "all",
     "Affiliation": "owner,collaborator,organization_member",
-    "Owner": {
-      "WhiteList": [],
-      "BlackList": ["oogle"]
-    },
-    "Name": {
-      "WhiteList": [],
-      "BlackList": []
-    },
     "Language": {
       "WhiteList": [
-        "Go"
+        "Go",
+        "Racket"
       ],
-      "BlackList": []
+      "BlackList": null
     },
     "Conduct": {
-      "WhiteList": [],
+      "WhiteList": null,
       "BlackList": [
         "NO ROBOTS",
         "ROBOTS NOT WELCOME"
       ]
     },
-    "Description": {
-      "WhiteList": [],
-      "BlackList": []
-    },
+    "Description": null,
     "IsFork": false,
     "IsPrivate": false,
     "Archived": false,
@@ -51,17 +53,11 @@
       "Min": 0,
       "Max": 4294967295
     },
-    "WatchersCount": {
-      "Min": 0,
-      "Max": 4294967295
-    },
-    "NetworkCount": {
-      "Min": 0,
-      "Max": 4294967295
-    },
+    "WatchersCount": null,
+    "NetworkCount": null,
     "Size": {
       "Min": 0,
-      "Max": 10200
+      "Max": 11200
     },
     "CreatedAt": null,
     "UpdatedAt": null,
@@ -123,13 +119,13 @@
     "AuthorName": "ia",
     "Email": "isaac.ardis@gmail.com",
     "AddPaths": {
-      "WhiteList": [],
+      "WhiteList": null,
       "BlackList": [
         "vendor",
-        "pkg",
-        "test.*data",
-        "assets",
-        "example"
+        "pkg\\/",
+        "testdata",
+        "assets\\/",
+        "\/data\/"
       ]
     },
     "StripeList": [
@@ -141,7 +137,7 @@
   },
   "PullRequestConfig": {
     "Title": "gofmt",
-    "Body": "\nJust ran\n\n\tgofmt -w .\n\non the project root. That's all.\n\n\u003e https://blog.golang.org/go-fmt-your-code\n",
+    "Body": "\nJust ran\n\n\tgofmt -w .\n\non the project root. \n\n\u003e https://blog.golang.org/go-fmt-your-code\n",
     "BodyFile": "",
     "OrgFork": ""
   },
