@@ -75,7 +75,7 @@ func NewGoogleGithubProvider(username, token string) *GoogleGithubRepoProvider {
 				gp.throttle = time.Tick(gp.throttleD)
 			}
 
-			if gp.reqCount > 100 {
+			if gp.reqCount > 1000 {
 				panic("TOO MANY REQUESTS (DEVELOPMENT)")
 			}
 		}
