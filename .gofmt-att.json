@@ -16,8 +16,9 @@
     "Visibility": "all",
     "Affiliation": "owner,collaborator,organization_member",
     "Owner": {
-      "WhiteList": [],
-      "BlackList": ["oogle"]
+      "WhiteList": [
+      ],
+      "BlackList": ["oogle", "alecthomas"]
     },
     "Name": {
       "WhiteList": [],
@@ -33,7 +34,10 @@
       "WhiteList": [],
       "BlackList": [
         "NO ROBOTS",
-        "ROBOTS NOT WELCOME"
+        "ROBOTS NOT WELCOME",
+        "DONT DISTURB",
+        "DO NOT DISTURB",
+        "NOFMT"
       ]
     },
     "Description": {
@@ -133,7 +137,9 @@
         "example",
         "data\/",
         "dep(|s)\/",
-        "bindata"
+        "bindata",
+        "_\W",
+        "\W_"
       ]
     },
     "StripeList": [
