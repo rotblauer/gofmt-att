@@ -21,6 +21,7 @@ type GitConfig struct {
 	BasePath string
 	*GitCommitConfig
 	AddPaths *remote.MatchTextSpec
+	AddContent *remote.MatchTextSpec
 	StripeList StripeList
 }
 

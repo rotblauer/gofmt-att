@@ -334,9 +334,14 @@ func (rp *GoogleGithubRepoProvider) ForkRepo(config *ForkConfig, oR *RepoT) (ori
 
 func (rp *GoogleGithubRepoProvider) CreatePullRequest(pr *PullRequestT, branchNameBase string) (err error) {
 	rp.reqCount++
-	// check for open prs matching what we're about to make.
+	// check for already existing PRs matching what we're about to make
 	// NO DUPLICATE PRs!
-	prs, res, err := rp.client.PullRequests.List(rp.ctx, pr.Owner.Name, pr.Name, &github.PullRequestListOptions{ListOptions: github.ListOptions{PerPage: PageMax}}) // State:"open" // either, really, at this point
+	// TODO this should become it's own process;
+	//   - on startup, get all of our user's (or forking org)'s PRs.
+	//	 - add them all (the new/uniq ones, at least) to a dedicated set in the db.
+	//   - add checks against that db during the fetch filtering
+	//   - update that list (just for redundancy) when a PR has been submitted
+	prs, res, err := rp.client.PullRequests.List(rp.ctx, pr.Owner.Name, pr.Name, &github.PullRequestListOptions{ListOptions: github.ListOptions{PerPage: PageMax}})
 	if ok, e := wrapGHRespErr(res, err); !ok {
 		if len(prs) != 0 {
 			err = e

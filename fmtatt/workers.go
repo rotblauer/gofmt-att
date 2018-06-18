@@ -68,10 +68,18 @@ func (f *FmtAtt) fmter(r *remote.RepoT) (err error) {
 var fileAddMatchReg = regexp.MustCompile(`M\s*(?P<FILE>.*)\b`)
 
 func (f *FmtAtt) add(r *remote.RepoT, outcome *remote.Outcome, status string) (added int, err error) {
+
+	// collect a list of all changed files
+	addFiles := []string{}
+
+	// remove from list all files with any of their top 100 lines containing a match for a regex describing comments noting an automatically generated file,
+	// eg. 'DO NOT EDIT', 'automatically', or 'generated'.
+
+
 	// collect a set of add-able paths, if params are spec'd
 	if addFileSpecs := f.Config.GitConfig.AddPaths; addFileSpecs != nil {
 		// collect addable files
-		addFiles := []string{}
+
 		compileRegexes := func(list []string)(res []*regexp.Regexp) {
 			for _, s := range list {
 				res = append(res, regexp.MustCompile(s))

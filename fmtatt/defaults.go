@@ -97,6 +97,27 @@ var DefaultGitConfig = &git.GitConfig{
 		WhiteList: []string{},
 		BlackList: []string{`vendor\/`, `pkg\/`, "testdata", `assets\/`},
 	},
+	AddContent: &remote.MatchTextSpec{
+		WhiteList: []string{},
+		BlackList: []string{
+			/*
+			https://regex101.com/r/4ffW5H/2
+
+// DO NOT EDIT!
+// DONT EDIT!
+// DON'T EDIT ME
+// This file is auto-generated!
+// DO NOT EDIT! This file is generated automatically
+// DO NOT EDIT! This file is generated automaticaly
+// This is a generated file, created automatically
+// This file is generated automaticaly
+			 */
+			`^\/\/\s?(do(|\s?)n.?t\W?(edit|change|remove|add|tamper)|)(.*(auto(m|-)|)|generat|)`,
+
+
+
+		},
+	},
 	StripeList: git.StripeList{
 		`M\s*(|\/)vendor\/github\.com\/(?P<OWNER>\w*)\/(?P<REPO>[\w-]*\b)`,
 	},
